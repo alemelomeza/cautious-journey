@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -22,7 +21,7 @@ func main() {
 
 	s := &http.Server{
 		Handler: r,
-		Addr: ":8000",
+		Addr:    ":8000",
 	}
 	log.Fatal(s.ListenAndServe())
 }

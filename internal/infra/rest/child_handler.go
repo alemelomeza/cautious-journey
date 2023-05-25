@@ -12,10 +12,10 @@ import (
 )
 
 type ChildHandler struct {
-	childService app.ChildService
+	childService *app.ChildService
 }
 
-func NewChildHandler(childService app.ChildService) *ChildHandler {
+func NewChildHandler(childService *app.ChildService) *ChildHandler {
 	return &ChildHandler{
 		childService: childService,
 	}
@@ -35,6 +35,10 @@ func (h *ChildHandler) List(w http.ResponseWriter, r *http.Request) {
 
 func (h *ChildHandler) Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	if vars["name"] == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	c, err := h.childService.GetChild(vars["name"])
 	if err != nil {
 		log.Printf("%v", err)
@@ -43,9 +47,10 @@ func (h *ChildHandler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 	cDTO := dto.ChildDTO{
 		Name: c.Name,
-		Age: c.Age,
+		Age:  c.Age,
 	}
 	log.Printf("%v", c)
 	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(cDTO)
 }
